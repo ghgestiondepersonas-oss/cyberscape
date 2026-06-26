@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyberscape · Grupo Harmony 2026</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --fucsia: #E50056;
+    --bordo: #A6053D;
+    --text-primary: #1a1a1a;
+    --text-secondary: #555;
+    --text-muted: #999;
+    --surface-0: #f5f5f5;
+    --surface-1: #f0f0f0;
+    --surface-2: #ffffff;
+    --border: rgba(0,0,0,0.12);
+    --border-strong: rgba(0,0,0,0.22);
+    --bg-success: #eaf3de;
+    --text-success: #3B6D11;
+    --bg-danger: #fcebeb;
+    --text-danger: #A32D2D;
+    --bg-warning: #faeeda;
+    --text-warning: #854F0B;
+    --radius: 8px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --text-primary: #f0f0f0;
+      --text-secondary: #aaa;
+      --text-muted: #666;
+      --surface-0: #1a1a1a;
+      --surface-1: #242424;
+      --surface-2: #2e2e2e;
+      --border: rgba(255,255,255,0.1);
+      --border-strong: rgba(255,255,255,0.2);
+      --bg-success: #173404;
+      --text-success: #97c459;
+      --bg-danger: #501313;
+      --text-danger: #f09595;
+      --bg-warning: #412402;
+      --text-warning: #ef9f27;
+    }
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--surface-0);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  #app {
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  .gh-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--fucsia); color: #fff;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.05em;
+    padding: 4px 12px; border-radius: 20px; margin-bottom: 1.25rem;
+  }
+
+  .title-xl {
+    font-size: 26px; font-weight: 700; color: var(--text-primary);
+    line-height: 1.2; margin-bottom: 0.5rem;
+  }
+  .subtitle {
+    font-size: 14px; color: var(--text-secondary);
+    margin-bottom: 1.75rem; line-height: 1.6;
+  }
+
+  .mode-tabs { display: flex; gap: 8px; margin-bottom: 1.75rem; }
+  .mode-tab {
+    flex: 1; padding: 10px 6px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    background: var(--surface-1); color: var(--text-secondary);
+    font-size: 13px; cursor: pointer; text-align: center;
+    transition: all 0.15s;
+  }
+  .mode-tab.active {
+    border-color: var(--fucsia); color: var(--fucsia);
+    background: var(--surface-2); font-weight: 600;
+  }
+
+  .name-input {
+    width: 100%; padding: 12px 16px; font-size: 15px;
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius); color: var(--text-primary);
+    margin-bottom: 1rem; outline: none;
+    transition: border-color 0.15s;
+  }
+  .name-input:focus { border-color: var(--fucsia); }
+
+  .primary-btn {
+    width: 100%; padding: 14px; border: none;
+    border-radius: var(--radius);
+    font-size: 15px; font-weight: 600; cursor: pointer;
+    background: var(--fucsia); color: #fff;
+    margin-bottom: 0.75rem;
+    transition: background 0.15s, opacity 0.15s;
+  }
+  .primary-btn:disabled { opacity: 0.4; cursor: default; }
+  .primary-btn:not(:disabled):hover { background: var(--bordo); }
+
+  .secondary-btn {
+    width: 100%; padding: 12px; border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    font-size: 14px; font-weight: 500; cursor: pointer;
+    background: var(--surface-1); color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+    transition: background 0.15s;
+  }
+  .secondary-btn:hover { background: var(--surface-2); }
+
+  .share-box {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1rem 1.25rem;
+    text-align: center; margin-bottom: 1.25rem;
+  }
+  .share-code-val {
+    font-size: 32px; font-weight: 700;
+    letter-spacing: 0.15em; color: var(--fucsia);
+  }
+  .share-hint { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+  .room-indicator { display: flex; gap: 6px; margin-bottom: 1.25rem; }
+  .room-dot {
+    flex: 1; height: 6px; border-radius: 3px;
+    background: var(--border-strong); transition: background 0.3s;
+  }
+  .room-dot.done { background: var(--bordo); }
+  .room-dot.active { background: var(--fucsia); }
+
+  .progress-bar {
+    height: 4px; background: var(--border);
+    border-radius: 2px; overflow: hidden; margin-bottom: 0.4rem;
+  }
+  .progress-fill {
+    height: 100%; background: var(--fucsia);
+    transition: width 0.4s ease;
+  }
+  .progress-label {
+    font-size: 12px; color: var(--text-muted); margin-bottom: 1.25rem;
+  }
+
+  .room-card {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 14px; padding: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .room-tag {
+    font-size: 11px; font-weight: 700; color: var(--fucsia);
+    text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.4rem;
+  }
+  .room-title {
+    font-size: 17px; font-weight: 700; color: var(--text-primary);
+    margin-bottom: 0.6rem; line-height: 1.3;
+  }
+  .room-desc {
+    font-size: 13.5px; color: var(--text-secondary);
+    line-height: 1.6; margin-bottom: 1.1rem;
+    padding: 10px 12px;
+    background: var(--surface-0);
+    border-radius: var(--radius);
+    border-left: 3px solid var(--fucsia);
+  }
+
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .opt-btn {
+    width: 100%; text-align: left; padding: 11px 14px;
+    background: var(--surface-1);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    font-size: 13.5px; color: var(--text-primary);
+    cursor: pointer; line-height: 1.45;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .opt-btn:hover:not(:disabled) { border-color: var(--fucsia); background: var(--surface-2); }
+  .opt-btn.correct { border-color: #3B6D11 !important; background: var(--bg-success) !important; color: var(--text-success) !important; font-weight: 600; }
+  .opt-btn.wrong   { border-color: #A32D2D !important; background: var(--bg-danger)  !important; color: var(--text-danger)  !important; }
+  .opt-btn:disabled { cursor: default; }
+
+  .feedback {
+    margin-top: 1rem; font-size: 13px; line-height: 1.6;
+    padding: 12px 14px; border-radius: var(--radius); display: none;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: var(--bg-success); color: var(--text-success); }
+  .feedback.ko { background: var(--bg-danger);  color: var(--text-danger);  }
+
+  .next-btn {
+    margin-top: 1rem; width: 100%; padding: 12px;
+    background: var(--bordo); color: #fff; border: none;
+    border-radius: var(--radius); font-size: 14px; font-weight: 600;
+    cursor: pointer; display: none; transition: background 0.15s;
+  }
+  .next-btn:hover { background: var(--fucsia); }
+  .next-btn.show { display: block; }
+
+  .centered { text-align: center; padding: 0.5rem 0; }
+  .big-icon { font-size: 64px; margin-bottom: 0.5rem; display: block; }
+  .result-title { font-size: 24px; font-weight: 700; margin-bottom: 0.5rem; }
+  .result-title.danger { color: #A32D2D; }
+  .result-title.success { color: #3B6D11; }
+  .result-msg { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1.5rem; }
+
+  .hacked-detail {
+    background: var(--bg-danger); border: 1px solid rgba(163,45,45,0.3);
+    border-radius: 10px; padding: 1rem; text-align: left; margin-bottom: 1.5rem;
+  }
+  .hacked-detail p { font-size: 13px; color: var(--text-danger); line-height: 1.6; }
+
+  .score-badge {
+    display: inline-block; background: var(--bordo); color: #fff;
+    font-size: 20px; font-weight: 700; padding: 10px 32px;
+    border-radius: 30px; margin-bottom: 1.5rem;
+  }
+
+  .lb-title {
+    font-size: 13px; font-weight: 600; color: var(--text-secondary);
+    margin-bottom: 0.75rem; margin-top: 0.25rem;
+  }
+  .lb-row {
+    display: flex; align-items: center;
+    padding: 9px 12px; border-radius: 10px; margin-bottom: 6px;
+    background: var(--surface-1); border: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .lb-row.me { border-color: var(--fucsia); background: var(--surface-2); }
+  .lb-rank { font-weight: 700; color: var(--fucsia); min-width: 26px; }
+  .lb-name { flex: 1; color: var(--text-primary); margin: 0 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lb-hacked { font-size: 11px; color: var(--text-danger); margin-left: 4px; white-space: nowrap; }
+  .lb-score { font-weight: 700; color: var(--text-primary); white-space: nowrap; }
+
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.25rem; }
+  .stat-card {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px 14px;
+  }
+  .stat-num { font-size: 26px; font-weight: 700; color: var(--text-primary); }
+  .stat-num.danger { color: #A32D2D; }
+  .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  .host-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--bg-warning); color: var(--text-warning);
+    font-size: 11px; font-weight: 600; padding: 4px 12px;
+    border-radius: 20px; margin-bottom: 1.25rem;
+  }
+
+  .hint-text {
+    font-size: 12px; color: var(--text-muted);
+    text-align: center; margin-top: 0.5rem;
+  }
+
+  @media (max-width: 360px) {
+    .title-xl { font-size: 22px; }
+    .room-title { font-size: 15px; }
+    .opt-btn { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ACCESS CODE -->
+  <div id="screen-access" class="screen active">
+    <div class="gh-badge">🔐 Grupo Harmony · 2026</div>
+    <p class="title-xl">Cyberscape<br>Escape Room</p>
+    <p class="subtitle">Ingresá el código de sesión que te mostró el presentador para acceder al juego.</p>
+    <input class="name-input" id="access-code" maxlength="12" placeholder="Código de sesión" oninput="checkCode()" style="text-transform:uppercase;letter-spacing:0.1em;font-weight:600" />
+    <div id="code-error" style="font-size:13px;color:var(--text-danger);margin:-0.5rem 0 0.75rem;display:none">Código incorrecto. Pedíselo al presentador.</div>
+    <button class="primary-btn" id="access-btn" onclick="submitCode()" disabled>Continuar</button>
+    <p class="hint-text">¿Sos el presentador? <span onclick="goHostDirect()" style="color:var(--fucsia);cursor:pointer;text-decoration:underline">Ingresá acá</span></p>
+  </div>
+
+  <!-- HOME -->
+  <div id="screen-home" class="screen">
+    <div class="gh-badge">🔐 Grupo Harmony · 2026</div>
+    <p class="title-xl">Cyberscape<br>Escape Room</p>
+    <p class="subtitle">¿Sabés reconocer una amenaza real? Superá las 5 salas y demostrá que no te hackean.</p>
+
+    <div class="mode-tabs">
+      <div class="mode-tab active" onclick="setMode('play')" id="tab-play">Jugar</div>
+      <div class="mode-tab" onclick="setMode('host')" id="tab-host">Pantalla host</div>
+    </div>
+
+    <div id="mode-play">
+      <input class="name-input" id="player-name" maxlength="24" placeholder="Tu nombre o apodo" oninput="checkName()" />
+      <button class="primary-btn" id="start-btn" onclick="startGame()" disabled>Entrar al escape room</button>
+      <p class="hint-text">Compartí esta página con todos los participantes</p>
+    </div>
+
+    <div id="mode-host" style="display:none">
+      <div class="share-box">
+        <div class="share-code-val">HARMONY26</div>
+        <div class="share-hint">Mostrá este código mientras todos abren la página</div>
+      </div>
+      <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin-bottom:1.25rem">
+        Cada participante abre esta página en su celular o PC, ingresa su nombre y juega de forma individual. El ranking se actualiza en tiempo real.
+      </p>
+      <button class="primary-btn" onclick="showHostPanel()">Ver resultados en vivo</button>
+    </div>
+  </div>
+
+  <!-- GAME -->
+  <div id="screen-game" class="screen">
+    <div class="gh-badge" id="room-label">Sala 1 de 5</div>
+    <div class="room-indicator" id="room-dots"></div>
+    <div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div>
+    <p class="progress-label" id="prog-label"></p>
+    <div id="question-area"></div>
+  </div>
+
+  <!-- HACKED -->
+  <div id="screen-hacked" class="screen">
+    <div class="centered">
+      <span class="big-icon">💀</span>
+      <p class="result-title danger">¡Fuiste hackeado!</p>
+      <p class="result-msg" id="hacked-msg"></p>
+      <div class="hacked-detail"><p id="hacked-explain"></p></div>
+      <button class="primary-btn" onclick="retryGame()">Intentar de nuevo</button>
+      <button class="secondary-btn" onclick="goResults()">Ver el ranking</button>
+    </div>
+  </div>
+
+  <!-- WIN -->
+  <div id="screen-win" class="screen">
+    <div class="centered">
+      <span class="big-icon">🛡️</span>
+      <p class="result-title success">¡Escape completado!</p>
+      <p class="result-msg">Superaste las 5 salas sin caer en ninguna trampa. Sos parte del escudo de Grupo Harmony.</p>
+      <div class="score-badge" id="final-score">0 pts</div>
+      <div id="win-leaderboard"></div>
+      <button class="primary-btn" style="margin-top:1rem" onclick="retryGame()">Jugar de nuevo</button>
+    </div>
+  </div>
+
+  <!-- HOST -->
+  <div id="screen-host" class="screen">
+    <div class="host-badge"><i class="ti ti-presentation" aria-hidden="true"></i> Vista del presentador</div>
+    <p class="title-xl" style="margin-bottom:1rem">Resultados en vivo</p>
+    <div class="stat-grid" id="host-stats"></div>
+    <button class="secondary-btn" onclick="renderHostPanel()"><i class="ti ti-refresh" aria-hidden="true"></i> Actualizar</button>
+    <p class="lb-title">Ranking completo</p>
+    <div id="host-leaderboard"></div>
+    <button class="secondary-btn" style="margin-top:1rem" onclick="showScreen('screen-home')">← Volver al inicio</button>
+  </div>
+
+</div>
+<script>
+const ROOMS = [
+  {
+    tag:"Sala 1 · Phishing",
+    title:"El email sospechoso",
+    desc:"Recibís este email: «Estimado/a, su cuenta de Microsoft 365 será suspendida en 24 horas. Haga clic aquí para verificar su identidad: http://micros0ft-verify.net/login». ¿Qué hacés?",
+    options:[
+      "Hago clic rápido antes de que me bloqueen la cuenta",
+      "Verifico el dominio del link — dice micros0ft con un cero, no es Microsoft real",
+      "Le reenvío el mail a un compañero para que lo vea también",
+      "Respondo al remitente preguntando si es verdadero"
+    ],
+    correct:1,
+    ok:"Bien detectado. El dominio falso es la señal clave: micros0ft.net en lugar de microsoft.com. La urgencia («24 horas») es una táctica clásica para que no pienses.",
+    ko:"Esta es una trampa de phishing clásica. El link usa un cero en lugar de la letra 'o' para imitar a Microsoft. Reenviar o responder también es peligroso — amplifica el ataque."
+  },
+  {
+    tag:"Sala 2 · Teams externos",
+    title:"El contacto desconocido",
+    desc:"Te aparece en Teams una solicitud de chat de 'Martín García' con la badge 'Externo'. El mensaje dice: «Hola, soy de Givaudan, proveedor de Grupo Harmony. Aceptame como contacto para coordinar la entrega del próximo mes». No lo conocés ni esperabas el mensaje.",
+    options:[
+      "Lo acepto como contacto, si dice que es de Givaudan debe ser real",
+      "Lo acepto y le pregunto de qué entrega habla",
+      "No lo acepto, consulto con mi responsable si Givaudan tiene contacto asignado en la empresa y verifico por otro canal",
+      "Lo ignoro y sigo trabajando"
+    ],
+    correct:2,
+    ok:"Correcto. Ante un externo desconocido en Teams, la acción segura es no aceptar y verificar por otro canal (teléfono, email corporativo o con tu responsable). Al aceptarlo, compartís información de tu perfil y abrís un canal de comunicación que puede usarse para ataques futuros.",
+    ko:"Aceptar un contacto externo desconocido en Teams es riesgoso aunque mencione una empresa real. Los atacantes investigan los proveedores de sus víctimas para parecer legítimos. Siempre verificá por otro canal antes de aceptar."
+  },
+  {
+    tag:"Sala 3 · MFA sospechoso",
+    title:"La aprobación que no pediste",
+    desc:"Son las 10 de la mañana, estás en una reunión. De repente te llega una notificación push en el celular del Authenticator pidiendo que apruebes un inicio de sesión en Microsoft 365. El MFA es el sistema de doble factor que manda una notificación a tu celular para confirmar que sos vos quien está ingresando. Vos no estás intentando entrar a ningún sistema en ese momento.",
+    options:[
+      "La apruebo, capaz es una actualización automática del sistema",
+      "La ignoro y sigo con la reunión",
+      "La rechazo, cambio mi contraseña apenas puedo y aviso a IT",
+      "La apruebo para que deje de molestar y después aviso"
+    ],
+    correct:2,
+    ok:"Exacto. Una notificación de MFA que no solicitaste significa que alguien tiene tu contraseña y está intentando entrar. Rechazar corta el acceso en ese momento, pero cambiar la contraseña es urgente porque la tuya ya está comprometida.",
+    ko:"Una notificación de MFA no solicitada nunca es automática ni casual — significa que alguien tiene tu contraseña y está intentando ingresar ahora mismo. Aprobarla le da acceso total a tu cuenta de M365."
+  },
+  {
+    tag:"Sala 4 · Uso de IA",
+    title:"El borrador con datos reales",
+    desc:"Necesitás redactar una propuesta para un cliente. Tenés un documento interno con datos de contacto, precios y condiciones. Querés usar una IA para armar el borrador. ¿Cómo lo hacés?",
+    options:[
+      "Pego todo el documento en ChatGPT — es rápido y el resultado es mejor",
+      "Uso cualquier IA disponible y borro el historial cuando termino",
+      "Armo la estructura de la propuesta en un documento en blanco (sin datos reales) y se la paso a la IA para que me ayude con el formato y el texto",
+      "Pego el documento en Gemini, que es de Google y debe ser más seguro"
+    ],
+    correct:2,
+    ok:"Exacto. La clave es separar la estructura del contenido sensible. Podés pedirle a cualquier IA que te ayude con el formato, el tono y los títulos sin exponerle datos de clientes, precios ni condiciones reales. Los datos sensibles los completás vos después.",
+    ko:"Las IAs públicas guardan el historial de conversaciones en sus servidores. Pegar datos de clientes, precios o condiciones comerciales es una fuga de información aunque borres el chat. La práctica segura es trabajar solo con la estructura, sin datos reales."
+  },
+  {
+    tag:"Sala 5 · Respuesta a incidentes",
+    title:"El adjunto inesperado",
+    desc:"Abrís tu Outlook y ves un email de 'soporte@micr0soft-help.com' con un adjunto llamado 'Actualización_urgente.svg'. No lo esperabas. ¿Cuál es tu próximo paso?",
+    options:[
+      "Abro el adjunto para ver de qué se trata",
+      "Lo borro sin hacer nada más",
+      "No hago clic, no reenvío, y abro un ticket en el portal de soporte IT",
+      "Le pregunto a un compañero si también le llegó"
+    ],
+    correct:2,
+    ok:"Perfecto. No clic, no reenvío, ticket a IT. Los archivos .svg pueden ejecutar código al abrirse. Reportar permite que IT proteja a todos los demás también.",
+    ko:"Borrar sin reportar parece seguro, pero IT necesita saber para proteger al resto de la organización. Y jamás abrir un .svg inesperado — puede ejecutar código malicioso al abrirse."
+  }
+];
+
+const ACCESS_CODE = 'HARMONY26';
+const HOST_CODE = 'HOST2026';
+let playerName='', currentRoom=0, score=0, answered=false;
+const STORAGE_KEY='harmony_cyber_lb_v2';
+
+function checkCode(){
+  const v=document.getElementById('access-code').value.trim().toUpperCase();
+  document.getElementById('access-btn').disabled = v.length < 4;
+  document.getElementById('code-error').style.display='none';
+}
+function submitCode(){
+  const v=document.getElementById('access-code').value.trim().toUpperCase();
+  if(v===ACCESS_CODE){ showScreen('screen-home'); }
+  else if(v===HOST_CODE){ showHostPanel(); }
+  else { document.getElementById('code-error').style.display='block'; }
+}
+function goHostDirect(){
+  showHostPanel();
+}
+
+function getLeaderboard(){
+  try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');}catch(e){return[];}
+}
+function saveToLeaderboard(name,sc,hacked){
+  let lb=getLeaderboard();
+  lb=lb.filter(e=>e.name!==name);
+  lb.push({name,score:sc,hacked,ts:Date.now()});
+  lb.sort((a,b)=>b.score-a.score);
+  lb=lb.slice(0,100);
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(lb));}catch(e){}
+}
+
+function setMode(m){
+  document.getElementById('mode-play').style.display=m==='play'?'block':'none';
+  document.getElementById('mode-host').style.display=m==='host'?'block':'none';
+  document.getElementById('tab-play').classList.toggle('active',m==='play');
+  document.getElementById('tab-host').classList.toggle('active',m==='host');
+}
+function checkName(){
+  const v=document.getElementById('player-name').value.trim();
+  document.getElementById('start-btn').disabled=v.length<2;
+}
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function startGame(){
+  playerName=document.getElementById('player-name').value.trim();
+  if(!playerName)return;
+  currentRoom=0;score=0;answered=false;
+  showScreen('screen-game');
+  renderRoom();
+}
+function retryGame(){
+  currentRoom=0;score=0;answered=false;
+  showScreen('screen-game');
+  renderRoom();
+}
+function renderRoom(){
+  const r=ROOMS[currentRoom];
+  const total=ROOMS.length;
+  document.getElementById('room-label').textContent='Sala '+(currentRoom+1)+' de '+total;
+  let dots='';
+  for(let i=0;i<total;i++){
+    let cls=i<currentRoom?'done':(i===currentRoom?'active':'');
+    dots+='<div class="room-dot '+cls+'"></div>';
+  }
+  document.getElementById('room-dots').innerHTML=dots;
+  const pct=Math.round((currentRoom/total)*100);
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-label').textContent=currentRoom+' de '+total+' salas superadas · '+score+' pts';
+  let optsHtml=r.options.map((o,i)=>'<button class="opt-btn" id="opt-'+i+'" onclick="answer('+i+')">'+o+'</button>').join('');
+  document.getElementById('question-area').innerHTML=
+    '<div class="room-card">'+
+      '<div class="room-tag">'+r.tag+'</div>'+
+      '<div class="room-title">'+r.title+'</div>'+
+      '<div class="room-desc">'+r.desc+'</div>'+
+      '<div class="options">'+optsHtml+'</div>'+
+      '<div class="feedback" id="feedback"></div>'+
+      '<button class="next-btn" id="next-btn" onclick="nextRoom()">Siguiente sala →</button>'+
+    '</div>';
+  answered=false;
+}
+function answer(idx){
+  if(answered)return;
+  answered=true;
+  const r=ROOMS[currentRoom];
+  const isCorrect=idx===r.correct;
+  document.querySelectorAll('.opt-btn').forEach((b,i)=>{
+    b.disabled=true;
+    if(i===r.correct)b.classList.add('correct');
+    if(i===idx&&!isCorrect)b.classList.add('wrong');
+  });
+  const fb=document.getElementById('feedback');
+  fb.classList.add('show');
+  if(isCorrect){
+    const pts=200-(currentRoom*10);
+    score+=pts;
+    fb.classList.add('ok');
+    fb.innerHTML='✓  '+r.ok;
+    document.getElementById('next-btn').classList.add('show');
+  } else {
+    fb.classList.add('ko');
+    fb.innerHTML='✗  '+r.ko;
+    setTimeout(()=>showHacked(r),1800);
+  }
+}
+function showHacked(r){
+  saveToLeaderboard(playerName,score,true);
+  document.getElementById('hacked-msg').textContent=
+    'Caíste en la sala "'+r.title+'". En el mundo real, esto podría haber comprometido tu cuenta y los sistemas de Grupo Harmony.';
+  document.getElementById('hacked-explain').textContent=
+    'Respuesta correcta: "'+r.options[r.correct]+'". '+r.ko;
+  showScreen('screen-hacked');
+}
+function nextRoom(){
+  if(currentRoom<ROOMS.length-1){currentRoom++;renderRoom();}
+  else{saveToLeaderboard(playerName,score,false);showWin();}
+}
+function showWin(){
+  document.getElementById('final-score').textContent=score+' pts';
+  renderLb('win-leaderboard');
+  showScreen('screen-win');
+}
+function goResults(){
+  renderLb('win-leaderboard');
+  showScreen('screen-win');
+}
+function renderLb(containerId){
+  const lb=getLeaderboard();
+  if(!lb.length){
+    document.getElementById(containerId).innerHTML='<p style="font-size:13px;color:var(--text-muted);text-align:center">Todavía no hay participantes.</p>';
+    return;
+  }
+  let html='<p class="lb-title">Ranking · '+lb.length+' jugadores</p>';
+  lb.slice(0,15).forEach((e,i)=>{
+    const isMe=e.name===playerName;
+    html+='<div class="lb-row'+(isMe?' me':'')+'">'+
+      '<span class="lb-rank">#'+(i+1)+'</span>'+
+      '<span class="lb-name">'+e.name+(isMe?' (vos)':'')+'</span>'+
+      (e.hacked?'<span class="lb-hacked">💀 hackeado</span>':'<span style="font-size:11px;color:var(--text-success);margin-left:4px">🛡️</span>')+
+      '<span class="lb-score">'+e.score+' pts</span>'+
+    '</div>';
+  });
+  document.getElementById(containerId).innerHTML=html;
+}
+function showHostPanel(){renderHostPanel();showScreen('screen-host');}
+function renderHostPanel(){
+  const lb=getLeaderboard();
+  const total=lb.length;
+  const hacked=lb.filter(e=>e.hacked).length;
+  const finished=lb.filter(e=>!e.hacked).length;
+  const avgScore=total?Math.round(lb.reduce((s,e)=>s+e.score,0)/total):0;
+  document.getElementById('host-stats').innerHTML=
+    '<div class="stat-card"><div class="stat-num">'+total+'</div><div class="stat-label">Jugadores</div></div>'+
+    '<div class="stat-card"><div class="stat-num">'+finished+'</div><div class="stat-label">Escaparon 🛡️</div></div>'+
+    '<div class="stat-card"><div class="stat-num danger">'+hacked+'</div><div class="stat-label">Hackeados 💀</div></div>'+
+    '<div class="stat-card"><div class="stat-num">'+avgScore+'</div><div class="stat-label">Promedio pts</div></div>';
+  if(!lb.length){
+    document.getElementById('host-leaderboard').innerHTML='<p style="font-size:13px;color:var(--text-muted)">Esperando participantes...</p>';
+    return;
+  }
+  let html='';
+  lb.slice(0,30).forEach((e,i)=>{
+    html+='<div class="lb-row">'+
+      '<span class="lb-rank">#'+(i+1)+'</span>'+
+      '<span class="lb-name">'+e.name+'</span>'+
+      (e.hacked?'<span class="lb-hacked">💀 hackeado</span>':'<span style="font-size:11px;color:var(--text-success);margin-left:4px">🛡️ escapó</span>')+
+      '<span class="lb-score">'+e.score+' pts</span>'+
+    '</div>';
+  });
+  document.getElementById('host-leaderboard').innerHTML=html;
+}
+</script>
+</body>
+</html>
